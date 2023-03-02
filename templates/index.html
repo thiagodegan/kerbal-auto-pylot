@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -9,6 +8,10 @@
 
   <body>
     <p>Página reenderizada pelo template</p>
+    {% if conectado %}
+    <p>Nome da nave ativa: {{ nave(conn).name }}</p>
+    {% else %}
+    <p>Nave não conectada</p>
+    {% endif %}
   </body>
-
 </html>
