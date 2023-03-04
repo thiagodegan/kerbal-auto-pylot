@@ -1,30 +1,62 @@
 from flask import Flask, render_template
 import krpc
+import threading
+import time
+from integracao import Telemetria
+
+# cria uma classe pra rodar em thread paralela
+
+"""
+class MyThread(threading.Thread):
+    def __init__(self, callbackAlt):
+        super(MyThread, self).__init__()
+        self.callbackAlt = callbackAlt
+
+    def run(self):
+        print('Thread Executando')
+        for i in range(10):
+            time.sleep(10)
+            self.callbackAlt(i)
 
 
-conn = None
-vessel = None
+def retornoAlt(chamada):
+    print(f'Executando chamada da th: {chamada}')
 
 
-def conectarKsp():
-    """Conecta no KSP"""
-    try:
-        return krpc.connect(name='Kerbal Auto-Pylot')
-    except ConnectionRefusedError:
-        print('Conexão recusada, verifique se o KRPC está ativo...')
+th = MyThread(retornoAlt)
+th.daemon = True
+th.start()
+
+"""
 
 
-def getVessel(conn):
-    """Retorna a nave"""
-    if (conn != None):
-        return conn.space_center.active_vessel
-    else:
-        print('A conexão não foi estabelicida!')
-    return None
+def altitudeMarCallback(altitude):
+    print(f'Altitude Mar: {altitude}')
 
 
-conn = conectarKsp()
-vessel = getVessel(conn=conn)
+def altitudeSoloCallback(altitude):
+    print(f'Altitude Solo: {altitude}')
+
+
+def apoastroCallback(apoastro):
+    print(f'Apoastro: {apoastro}')
+
+
+def periatroCallback(periastro):
+    print(f'Periastro: {periastro}')
+
+
+def angulacaoCallback(angulo):
+    print(f'Angulo: {angulo}')
+
+
+tel = Telemetria(AltitudeMarCallback=altitudeMarCallback,
+                 AltitudeSoloCallback=altitudeSoloCallback,
+                 ApoastroCallback=apoastroCallback,
+                 PeriastroCallback=periatroCallback,
+                 AngulacaoCallback=angulacaoCallback)
+tel.daemon = True
+tel.start()
 
 app = Flask(__name__)
 
@@ -33,7 +65,4 @@ app.config["DEBUG"] = True
 
 @app.route('/')
 def index():
-    if vessel == None:
-        return render_template('index.html', conectado=False)
-    else:
-        return render_template('index.html', conectado=True, nave=getVessel, conn=conn)
+    return render_template('index.html', conectado=False)
